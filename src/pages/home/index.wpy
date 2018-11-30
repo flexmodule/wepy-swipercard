@@ -1,0 +1,102 @@
+<style lang="less">
+page {
+  height: 100%;
+}
+.home {
+  swiper {
+    overflow: visible!important;
+    swiper-item {
+      width: 70%!important;
+      margin-left: 15%;
+      text-align: center;
+      overflow: visible!important;
+      &:after {
+        content: "";
+        display: inline-block;
+        width: 0;
+        height: 100%;
+        vertical-align: middle;
+      }
+      image {
+        width: 60%;
+        height: 60%;
+        vertical-align: middle;
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="home" @touchstart="touchstart" @touchmove="touchmove" @touchend="touchend">
+    <swiper indicator-dots="{{indicatorDots}}" circular="true"
+  autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" display-multiple-items="1" current="1" bindchange="abc">
+  <block wx:for="{{imgUrls}}" wx:key="item">
+    <swiper-item style="width:375px;height:120%;">
+      <image src="{{item}}" @tap="todetail({{index}})" class="slide-image" style="width:{{currentIndex==index?'100%':'70%'}};height:{{currentIndex==index?'100%':'60%'}};"/>
+    </swiper-item>
+  </block>
+</swiper>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import request from '@/utils/request.js';
+import { getRecFood } from '@/api/index.js';
+export default class Home extends wepy.page {
+  components = {};
+
+  data = {
+    canIUse: wx.canIUse('cover-view'),
+    imgUrls: [
+      "../../img/imgMineSPA.png",
+      "../../img/imgMineSPA.png",
+      "../../img/imgMineSPA.png"
+    ],
+    indicatorDots: true,
+    autoplay: false,
+    interval: 5000,
+    duration: 1000,
+    currentIndex: 1,
+    start:0,
+    end:"",
+    move:0
+  };
+  computed = {};
+
+  methods = {
+    touchend() {
+      var that=this
+      console.log("结束")
+      if(this.end>this.move) {
+         wx.navigateTo({
+     url:`/pages/teacherdetail/index?index=${that.currentIndex}`,  //跳转页面的路径，可带参数 ？隔开，不同参数用 & 分隔；相对路径，不需要.wxml后缀
+     success:function(){}  ,      //成功后的回调；
+     fail:function(){}    ,      //失败后的回调；
+     complete: function(){}      //结束后的回调(成功，失败都会执行)
+ })
+      }
+    },
+    touchmove(e) {
+      console.log(e)
+      this.move=e.touches[0].pageY;
+    },
+    touchstart(e) {
+      console.log(e)
+      this.start=e.touches[0].pageY;
+    },
+    todetail(index) {
+    //  this.currentIndex=e.detail.current;
+    }
+  };
+  abc(e) {
+    console.log(e.detail.current)
+    this.currentIndex=e.detail.current;
+  }
+  onShow() {}
+  onLoad() {
+    var res = wx.getSystemInfoSync();
+    this.$apply();
+  }
+}
+</script>

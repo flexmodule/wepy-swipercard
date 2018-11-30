@@ -1,0 +1,90 @@
+<style lang="less">
+page {
+  height: 100%;
+}
+.login {
+  height: 100%;
+  position: relative;
+  .back {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    margin: 0 auto;
+    image {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  .beginExplore {
+    width: 300rpx;
+    font: 30rpx/80rpx "";
+    background: red;
+    border-radius: 30rpx;
+    margin: 400rpx auto 0;
+    text-align: center;
+    color: #fff;
+    position: absolute;
+    bottom: 300rpx;
+    left: 0;
+    right: 0;
+    margin: auto;
+  }
+}
+</style>
+<template>
+  <view class="login">
+    <view class="back"><image src=""/></view>
+    <button wx:if="{{canIUse}}" class="beginExplore" open-type="getUserInfo" lang="zh_CN" bindgetuserinfo="onGotUserInfo">开始探索</button>
+    <view wx:else>微信版本过低,无法开启授权登录,请升级微信版本</view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy';
+import request from '@/utils/request.js';
+export default class Login extends wepy.page {
+  components = {
+    
+  };
+  data = {
+    canIUse: wx.canIUse('button.open-type.getUserInfo')
+  };
+  computed = {};
+  methods = {
+    
+  }
+  onGotUserInfo(e) {
+    console.log(e)
+    if(e.detail.userInfo) {
+      this.$parent.userInfo=e.detail.userInfo
+      if(wx.getStorageSync('avatarUrl')&&wx.getStorageSync('nickName')) {
+        
+      } else {
+        wx.setStorageSync('avatarUrl', e.detail.userInfo.avatarUrl);
+        wx.setStorageSync('nickName', e.detail.userInfo.nickName);
+      }
+      wx.navigateTo({
+        url:"/pages/home/index",  //跳转页面的路径，可带参数 ？隔开，不同参数用 & 分隔；相对路径，不需要.wxml后缀
+        success:function(){},       //成功后的回调；
+        fail: function(){} ,       //失败后的回调；
+        complete: function(){}      //结束后的回调(成功，失败都会执行)
+      })
+    } else {
+      wx.showModal({
+        title: '警告',
+        content: '您点击了拒绝授权，将无法进入小程序，请授权之后再进入!!!',
+        showCancel: false,
+        confirmText: '返回授权',
+        success: function(res) {
+          if (res.confirm) {
+            console.log('用户点击了“返回授权”');
+          }
+        }
+      });
+    }
+  }
+  onLoad() {
+    
+  }
+}
+</script>
